@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: aip-library-web
+    runtime: node
+    plan: starter
+    rootDir: .
+    buildCommand: pnpm install --frozen-lockfile=false && pnpm build
+    startCommand: pnpm start
+    envVars:
+      - key: NODE_VERSION
+        value: 20.19.0
+      - key: DATABASE_URL
+        sync: false

@@ -1,0 +1,41 @@
+{
+  "name": "aip-library",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "dev": "pnpm --filter @aip-library/web dev",
+    "build": "pnpm --filter @aip-library/web build",
+    "start": "pnpm --filter @aip-library/web start",
+    "lint": "pnpm exec eslint --no-error-on-unmatched-pattern \"apps/**/src/**/*.{js,jsx,mjs,cjs,ts,tsx}\" \"packages/**/src/**/*.{js,jsx,mjs,cjs,ts,tsx}\" \"scripts/**/*.{js,jsx,mjs,cjs,ts,tsx}\"",
+    "typecheck": "pnpm typecheck:web && pnpm typecheck:ui",
+    "typecheck:web": "pnpm --filter @aip-library/web typecheck",
+    "typecheck:ui": "pnpm --filter @aip-library/ui typecheck",
+    "test": "pnpm test:unit && pnpm test:e2e",
+    "test:unit": "vitest run --config vitest.config.ts",
+    "test:e2e": "playwright test --pass-with-no-tests",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx,mjs,cjs,json,md,yml,yaml,css}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix"
+    ]
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9.39.4",
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^24.0.0",
+    "eslint": "^9.34.0",
+    "eslint-config-next": "^15.0.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.1.4",
+    "prettier": "^3.6.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}
