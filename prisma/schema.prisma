@@ -6,3 +6,226 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Enums
+enum AccessType {
+  PUBLIC
+  PRIVATE
+  RESTRICTED
+}
+
+enum DocumentType {
+  AIP
+  SUPPLEMENT
+  NOTAM
+  CHART
+  OTHER
+}
+
+enum ConnectorStatus {
+  ACTIVE
+  INACTIVE
+  FAILED
+  MAINTENANCE
+}
+
+enum WatchStatus {
+  WATCHING
+  PAUSED
+  STOPPED
+}
+
+enum RunStatus {
+  PENDING
+  RUNNING
+  COMPLETED
+  FAILED
+}
+
+// Domain models
+model Region {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  states    State[]
+  documents Document[]
+
+  @@map("regions")
+}
+
+model State {
+  id        String   @id @default(uuid()) @db.Uuid
+  regionId  String   @db.Uuid
+  code      String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  region    Region   @relation(fields: [regionId], references: [id])
+  documents Document[]
+
+  @@unique([regionId, code])
+  @@index([regionId])
+  @@map("states")
+}
+
+model AIRACCycle {
+  id          String   @id @default(uuid()) @db.Uuid
+  cycle       String   @unique
+  startDate   DateTime
+  endDate     DateTime
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  documents   Document[]
+
+  @@map("airac_cycles")
+}
+
+model Connector {
+  id         String   @id @default(uuid()) @db.Uuid
+  name       String
+  type       String?
+  status     ConnectorStatus @default(ACTIVE)
+  access     AccessType       @default(PUBLIC)
+  baseUrl    String?
+  config     Json?
+  lastSeenAt DateTime?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  runs       ConnectorRun[]
+  health     ConnectorHealth[]
+  sourceHist SourceHistory[]
+  documents  Document[]
+  anomalies  Anomaly[]
+
+  @@unique([name])
+  @@map("connectors")
+}
+
+model ConnectorHealth {
+  id          String   @id @default(uuid()) @db.Uuid
+  connectorId String   @db.Uuid
+  status      ConnectorStatus
+  message     String?
+  checkedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  connector   Connector @relation(fields: [connectorId], references: [id])
+
+  @@index([connectorId])
+  @@map("connector_health")
+}
+
+model ConnectorRun {
+  id           String    @id @default(uuid()) @db.Uuid
+  connectorId  String    @db.Uuid
+  status       RunStatus @default(PENDING)
+  startedAt    DateTime?
+  finishedAt   DateTime?
+  recordsFound Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  connector    Connector  @relation(fields: [connectorId], references: [id])
+  logs         ScrapeLog[]
+
+  @@index([connectorId, startedAt])
+  @@map("connector_runs")
+}
+
+model Document {
+  id           String       @id @default(uuid()) @db.Uuid
+  connectorId  String?      @db.Uuid
+  regionId     String?      @db.Uuid
+  stateId      String?      @db.Uuid
+  airacCycleId String?      @db.Uuid
+  type         DocumentType
+  identifier   String
+  title        String?
+  url          String?
+  checksum     String?
+  publishedAt  DateTime?
+  retrievedAt  DateTime?
+  watchStatus  WatchStatus  @default(WATCHING)
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  connector    Connector?   @relation(fields: [connectorId], references: [id])
+  region       Region?      @relation(fields: [regionId], references: [id])
+  state        State?       @relation(fields: [stateId], references: [id])
+  airacCycle   AIRACCycle?  @relation(fields: [airacCycleId], references: [id])
+  histories    SourceHistory[]
+  anomalies    Anomaly[]
+
+  @@unique([connectorId, identifier])
+  @@index([type])
+  @@index([regionId])
+  @@index([stateId])
+  @@index([airacCycleId])
+  @@map("documents")
+}
+
+model SourceHistory {
+  id          String   @id @default(uuid()) @db.Uuid
+  documentId  String   @db.Uuid
+  connectorId String?  @db.Uuid
+  observedAt  DateTime @default(now())
+  rawUrl      String?
+  checksum    String?
+  metadata    Json?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  document    Document @relation(fields: [documentId], references: [id])
+  connector   Connector? @relation(fields: [connectorId], references: [id])
+
+  @@index([documentId])
+  @@index([connectorId])
+  @@map("source_histories")
+}
+
+model Anomaly {
+  id          String   @id @default(uuid()) @db.Uuid
+  documentId  String?  @db.Uuid
+  connectorId String?  @db.Uuid
+  kind        String
+  severity    String?
+  description String?
+  detectedAt  DateTime @default(now())
+  resolved    Boolean  @default(false)
+  resolvedAt  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  document    Document? @relation(fields: [documentId], references: [id])
+  connector   Connector? @relation(fields: [connectorId], references: [id])
+
+  @@index([documentId])
+  @@index([connectorId])
+  @@map("anomalies")
+}
+
+model ScrapeLog {
+  id             String   @id @default(uuid()) @db.Uuid
+  connectorRunId String   @db.Uuid
+  level          String
+  message        String
+  meta           Json?
+  loggedAt       DateTime @default(now())
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  run            ConnectorRun @relation(fields: [connectorRunId], references: [id])
+
+  @@index([connectorRunId])
+  @@map("scrape_logs")
+}
+
+model SystemConfig {
+  id          String   @id @default(uuid()) @db.Uuid
+  key         String   @unique
+  value       Json
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("system_config")
+}
