@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import "./globals.css";
+
+import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
   metadataBase: new URL("http://localhost:3000"),
@@ -22,7 +25,11 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body>{children}</body>
+      <body>
+        <Suspense fallback={null}>
+          <AppShell>{children}</AppShell>
+        </Suspense>
+      </body>
     </html>
   );
 }

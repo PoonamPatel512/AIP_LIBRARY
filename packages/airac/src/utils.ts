@@ -1,8 +1,14 @@
 import { ISODateString } from "./types";
 
 export function isoToDate(iso: ISODateString): Date {
-  const [y, m, d] = iso.split("-").map((s) => parseInt(s, 10));
-  return new Date(Date.UTC(y, m - 1, d));
+  const parts = iso.split("-");
+  const year = Number.parseInt(parts[0] ?? "2000", 10);
+  const month = Number.parseInt(parts[1] ?? "1", 10);
+  const day = Number.parseInt(parts[2] ?? "1", 10);
+  const safeYear = Number.isNaN(year) ? 2000 : year;
+  const safeMonth = Number.isNaN(month) ? 1 : month;
+  const safeDay = Number.isNaN(day) ? 1 : day;
+  return new Date(Date.UTC(safeYear, safeMonth - 1, safeDay));
 }
 
 export function dateToIso(d: Date): ISODateString {

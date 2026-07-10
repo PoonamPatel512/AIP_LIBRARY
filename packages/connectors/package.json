@@ -1,0 +1,13 @@
+{
+  "name": "@aip-library/connectors",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest -c ../../vitest.config.ts --include 'tests/**/*.test.ts'",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

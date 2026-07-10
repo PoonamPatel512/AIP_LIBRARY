@@ -2,19 +2,55 @@
 
 ## Project Identity
 
-AIP Library is a global aviation metadata platform focused on AIRAC cycles, AIP amendments, supplements, AICs, and publication metadata sourced from official AIS authorities worldwide.
+AIP Library is an AIP Publication Intelligence Platform. Its purpose is to answer one question with confidence: what official aviation publications became effective for a country during a specific AIRAC cycle?
 
 ## Product Boundary
 
-Phase 1 is strictly metadata and official links. The application records what was published, by whom, when, and where the official source can be verified. It does not host publication files.
+Phase 1 is strictly metadata and official links. The application records official publication metadata, provenance, and effective timing. It does not host publication files and does not function as a document repository.
+
+## Core Product Navigation
+
+Region
+
+↓
+
+Country
+
+↓
+
+AIRAC
+
+↓
+
+Publication List
+
+## Core Product Philosophy
+
+The application is designed to answer one question:
+
+"What official aviation publications became effective for this country during this AIRAC cycle?"
 
 ## Core Capabilities
 
-- Track publication metadata across jurisdictions and authorities
-- Preserve publication provenance and source links
-- Represent cycles, amendments, supplements, circulars, and related publication metadata
-- Surface current state and historical context
+- Track publication metadata across jurisdictions, authorities, and AIRAC cycles
+- Preserve publication provenance and official source links
+- Connect each publication to the country and AIRAC cycle in which it became effective
+- Surface current, previous, and future AIRAC context for each country
 - Support future ingestion and reconciliation workflows without losing source traceability
+
+## Publication Record Model
+
+Every publication record is anchored to:
+
+- Document Type
+- Document Number
+- Publication Date
+- Effective Date
+- AIRAC Cycle
+- Official Source URL
+- Discovery Timestamp
+- Connector
+- Status
 
 ## Non-Goals
 
@@ -28,7 +64,7 @@ Phase 1 is strictly metadata and official links. The application records what wa
 
 The application is a single Next.js 15 codebase that serves the frontend and route-handler backend. Domain rules are isolated from infrastructure. PostgreSQL stores normalized publication metadata through Prisma. Deployment is targeted to Render.
 
-New: A standalone AIRAC engine (`@aip-library/airac`) implements deterministic AIRAC cycle generation, lookup, and validation without depending on the web or database stack. See `docs/adr/ADR-003-AIRAC_ENGINE.md`.
+A standalone AIRAC engine (`@aip-library/airac`) implements deterministic AIRAC cycle generation, lookup, and validation without depending on the web or database stack. See `docs/adr/ADR-003-AIRAC_ENGINE.md`.
 
 ## Product Constraints
 
@@ -41,3 +77,4 @@ The system must remain auditable, deterministic, and conservative about trust. I
 - Route handlers are thin entry points
 - Persistence is mediated through explicit repositories and adapters
 - Documentation is a first-class product artifact
+- The domain model must preserve the relationship between region, country, AIRAC cycle, and official publications

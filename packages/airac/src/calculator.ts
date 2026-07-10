@@ -28,14 +28,14 @@ export function getPreviousCycle(cycle: AiracCycle): AiracCycle {
   const idx = parseInt(cycle.id.split("-").pop() || "0", 10);
   const prevIdx = idx - 1;
   const cycles = generateCycles(1, prevIdx);
-  return cycles[0];
+  return cycles[0] ?? cycle;
 }
 
 export function getNextCycle(cycle: AiracCycle): AiracCycle {
   const idx = parseInt(cycle.id.split("-").pop() || "0", 10);
   const nextIdx = idx + 1;
   const cycles = generateCycles(1, nextIdx);
-  return cycles[0];
+  return cycles[0] ?? cycle;
 }
 
 export function daysUntilEffective(cycle: AiracCycle, fromIso?: string): number {

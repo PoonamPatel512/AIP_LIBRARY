@@ -2,27 +2,34 @@
 
 ## Roadmap Philosophy
 
-The roadmap is organized around trusted metadata first, then controlled expansion. Each phase should produce a stable foundation for the next without forcing premature generalization.
+The roadmap is organized around trusted publication intelligence first, then controlled expansion. Each phase should produce a stable foundation for the next without forcing premature generalization.
 
 ## Phase 1
 
 - Establish repository standards and engineering governance
-- Define the aviation publication metadata model
-- Create the database schema and core persistence layer
-- Build the primary read surfaces for publication metadata and source links
-- Implement ingestion and reconciliation paths that preserve provenance
+- Define the country, AIRAC, and official publication metadata model
+- Create the database schema and core persistence layer for metadata-only records
+- Build the primary navigation flow of Region → Country → AIRAC → Publication List
+- Deliver country pages that expose current, previous, and future AIRAC context
+- Implement ingestion and reconciliation paths that preserve provenance and official source links
 - Add validation, testing, and operational observability around the core data flow
 
 ## Phase 2
 
 - Expand jurisdiction coverage and ingestion breadth
-- Improve search and filtering experiences
-- Add richer comparison and historical views
-- Expand automation for source validation and record refresh
+- Improve search, filtering, and cycle comparison experiences
+- Add richer historical views for publication changes by country and AIRAC
+- Expand automation for source validation, fresh discovery, and record refresh
 
 ## Phase 3
 
-    - Completed: `@aip-library/airac` package implements generation, lookup, validation, and formatting.
+- Extend the platform to additional publication types and authorities
+- Improve cross-country comparison and operational intelligence workflows
+- Strengthen analytics for publication change patterns and source reliability
+
+## Completed Foundation
+
+- `@aip-library/airac` implements deterministic AIRAC generation, lookup, validation, and formatting.
 
 ## Planning Rules
 
